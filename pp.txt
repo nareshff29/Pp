@@ -1,0 +1,106 @@
+-- // SERVICES
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- // VARIABLES
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- // CONFIGURATION
+local SHEIKH_SIZE = Vector3.new(2, 4, 2) -- Size of the Sheikh part
+local SHEIKH_COLOR = Color3.fromRGB(255, 200, 150) -- Skin tone color
+local ROTATION_SPEED = 10 -- Speed of rotation (degrees per second)
+
+-- // CREATE THE "PENIS SHEIKH" PART
+local function createSheikh()
+    local sheikhPart = Instance.new("Part")
+    sheikhPart.Name = "PenisSheikh"
+    sheikhPart.Size = SHEIKH_SIZE
+    sheikhPart.Anchored = true
+    sheikhPart.CanCollide = false
+    sheikhPart.Transparency = 0.5 -- Semi-transparent so you can see through it
+    sheikhPart.Color = SHEIKH_COLOR
+    
+    -- Add a "Face" or "Neck" look using a decal (optional, but funny)
+    local neck = Instance.new("SpecialMesh")
+    neck.MeshType = Enum.MeshType.Cylinder
+    neck.Scale = Vector3.new(1, 0.5, 1)
+    neck.Parent = sheikhPart
+    
+    -- Add a "Head" on top for the Sheikh look
+    local head = Instance.new("Part")
+    head.Name = "SheikhHead"
+    head.Size = Vector3.new(2, 2, 2)
+    head.Anchored = true
+    head.CanCollide = false
+    head.Color = Color3.fromRGB(255, 255, 255) -- White turban/head
+    head.Parent = sheikhPart
+    head.Position = Vector3.new(0, 3, 0) -- Position on top
+    
+    -- Add a "Face" decal to the head
+    local faceDecal = Instance.new("Decal")
+    faceDecal.Texture = "rbxassetid://262948517" -- Classic Roblox Face ID
+    faceDecal.Face = Enum.NormalId.Front
+    faceDecal.Parent = head
+    
+    return sheikhPart
+end
+
+-- // SPAWN AND TROLL LOGIC
+local function trollWithSheikh()
+    -- Remove existing one if any
+    local existing = Workspace:FindFirstChild("PenisSheikh")
+    if existing then 
+        existing:Destroy() 
+    end
+    
+    -- Create new one
+    local sheikh = createSheikh()
+    
+    -- Position it above your head or in front of you
+    sheikh.CFrame = HumanoidRootPart.CFrame * CFrame.new(0, 5, -3)
+    
+    -- Parent to Workspace so everyone sees it
+    sheikh.Parent = Workspace
+    
+    print("[Troll] Penis Sheikh Spawned!")
+    
+    -- Rotate it continuously
+    local connection
+    connection = RunService.Heartbeat:Connect(function(dt)
+        if not sheikh then 
+            connection:Disconnect() 
+            return 
+        end
+        
+        -- Rotate around Y-axis (spin like a top)
+        sheikh.CFrame = CFrame.new(sheikh.Position) * CFrame.Angles(0, ROTATION_SPEED * dt, 0)
+        
+        -- Optional: Bob up and down slightly
+        sheikh.Position = Vector3.new(sheikh.Position.X, 5 + math.sin(os.clock() * 2) * 0.5, sheikh.Position.Z)
+    end)
+    
+    -- Auto-destroy after 10 seconds to avoid clutter
+    task.delay(10, function()
+        if sheikh then
+            sheikh:Destroy()
+            connection:Disconnect()
+            print("[Troll] Sheikh despawned.")
+        end
+    end)
+end
+
+-- // INPUT HANDLER
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    -- Press [X] to spawn the Sheikh
+    if input.KeyCode == Enum.KeyCode.X then
+        trollWithSheikh()
+    end
+end)
+
+print("[Troll] Script Loaded! Press [X] to spawn Penis Sheikh.")
